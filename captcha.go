@@ -224,7 +224,7 @@ func (c *Captcha) Create(num int, t CharType) (*Image, string) {
 	c.drawBkg(dst)
 	c.drawNoises(dst)
 
-	str := string(c.GenerateRandCode(num, t))
+	str := string(GenerateRandCode(num, t))
 	c.drawString(dst, str)
 	//c.drawString(tmp, str)
 
@@ -248,7 +248,7 @@ var letters = []byte("34578acdefghjkmnpqstwxyABCDEFGHJKMNPQRSVWXY")
 // GenerateRandCode 生成随机验证码
 // size: 生成的验证码长度
 // charType: 生成的验证码的字符类型
-func (c *Captcha) GenerateRandCode(size int, charType CharType) []byte {
+func GenerateRandCode(size int, charType CharType) []byte {
 	ikind, result := int(charType), make([]byte, size)
 	isAll := charType > 2 || charType < 0
 	rand.Seed(time.Now().UnixNano())
