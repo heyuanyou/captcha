@@ -21,14 +21,14 @@ type Captcha struct {
 	size        image.Point
 }
 
-type StrType int
+type CharType int
 
 const (
-	NUM   StrType = iota // 数字
-	LOWER                // 小写字母
-	UPPER                // 大写字母
-	ALL                  // 全部
-	CLEAR                // 去除部分易混淆的字符
+	NUM   CharType = iota // 数字
+	LOWER                 // 小写字母
+	UPPER                 // 大写字母
+	ALL                   // 全部
+	CLEAR                 // 去除部分易混淆的字符
 )
 
 type DisturLevel int
@@ -215,7 +215,7 @@ func (c *Captcha) drawString(img *Image, str string) {
 }
 
 // Create 生成一个验证码图片
-func (c *Captcha) Create(num int, t StrType) (*Image, string) {
+func (c *Captcha) Create(num int, t CharType) (*Image, string) {
 	if num <= 0 {
 		num = 4
 	}
@@ -224,7 +224,7 @@ func (c *Captcha) Create(num int, t StrType) (*Image, string) {
 	c.drawBkg(dst)
 	c.drawNoises(dst)
 
-	str := string(c.randStr(num, int(t)))
+	str := string(c.GenerateRandCode(num, t))
 	c.drawString(dst, str)
 	//c.drawString(tmp, str)
 
@@ -245,11 +245,12 @@ func (c *Captcha) CreateCustom(str string) *Image {
 var fontKinds = [][]int{[]int{10, 48}, []int{26, 97}, []int{26, 65}}
 var letters = []byte("34578acdefghjkmnpqstwxyABCDEFGHJKMNPQRSVWXY")
 
-// 生成随机字符串
-// size 个数 kind 模式
-func (c *Captcha) randStr(size int, kind int) []byte {
-	ikind, result := kind, make([]byte, size)
-	isAll := kind > 2 || kind < 0
+// GenerateRandCode 生成随机验证码
+// size: 生成的验证码长度
+// charType: 生成的验证码的字符类型
+func (c *Captcha) GenerateRandCode(size int, charType CharType) []byte {
+	ikind, result := int(charType), make([]byte, size)
+	isAll := charType > 2 || charType < 0
 	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < size; i++ {
 		if isAll {
@@ -258,7 +259,7 @@ func (c *Captcha) randStr(size int, kind int) []byte {
 		scope, base := fontKinds[ikind][0], fontKinds[ikind][1]
 		result[i] = uint8(base + rand.Intn(scope))
 		// 不易混淆字符模式：重新生成字符
-		if kind == 4 {
+		if charType == 4 {
 			result[i] = letters[rand.Intn(len(letters))]
 		}
 	}
