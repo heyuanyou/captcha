@@ -1,4 +1,4 @@
-module captcha
+module github.com/heyuanyou/captcha
 
 go 1.17
 
